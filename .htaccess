@@ -1,0 +1,5 @@
+RewriteEngine On
+RewriteBase "/STUDIO ARGON/"
+
+# Rewrite for Blog Slugs
+RewriteRule ^blogs/([a-z0-9-]+)/?$ blog_detail.php?slug=$1 [L,QSA]
