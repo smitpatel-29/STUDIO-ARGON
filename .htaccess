@@ -1,4 +1,6 @@
 RewriteEngine On
+# For Local: RewriteBase "/STUDIO ARGON/"
+# For Live: RewriteBase /
 RewriteBase "/STUDIO ARGON/"
 
 # Rewrite for Blog Slugs

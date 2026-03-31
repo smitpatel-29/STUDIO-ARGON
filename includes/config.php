@@ -5,7 +5,11 @@ define('SITE_TAGLINE', 'Photorealistic 3D Architectural Rendering Studio');
 define('SITE_EMAIL', 'hello@studioargon.com');
 define('SITE_PHONE', '+1 234 567 8901');
 define('SITE_ADDRESS', 'Gujarat, India');
-define('BASE_URL', '/STUDIO%20ARGON/'); // Set this to your domain when live
+if ($_SERVER['HTTP_HOST'] == 'localhost') {
+    define('BASE_URL', '/STUDIO%20ARGON/');
+} else {
+    define('BASE_URL', '/');
+}
 
 // NAVIGATION MENU
 $nav_menu = [
