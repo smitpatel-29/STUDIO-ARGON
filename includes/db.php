@@ -1,27 +1,19 @@
 <?php
 /**
- * Loads environment variables from the .env file.
+ * Database Connection for Studio Argon Dynamic Portfolio
  */
-function load_env($path) {
-    if (!file_exists($path)) return false;
-    $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    foreach ($lines as $line) {
-        if (strpos(trim($line), '#') === 0 || empty(trim($line))) continue; 
-        list($name, $value) = explode('=', $line, 2);
-        putenv(trim($name) . "=" . trim($value));
-        $_ENV[trim($name)] = trim($value);
-    }
-    return true;
-}
 
-// Load .env relative to the current file (root of project)
-load_env(__DIR__ . '/../.env');
+// PRODUCTION DATABASE
+$db_host = 'localhost';
+$db_user = 'starlitc_argon';
+$db_pass = 'Smit!@1234';
+$db_name = 'starlitc_studio_argon';
 
-// DB CONFIG FROM ENVIRONMENT (Prioritizes .env values)
-$db_host = getenv('DB_HOST') ?: 'localhost';
-$db_user = getenv('DB_USER');
-$db_pass = getenv('DB_PASS');
-$db_name = getenv('DB_NAME');
+// LOCAL DATABASE (XAMPP)
+// $db_host = '127.0.0.1';
+// $db_user = 'root';
+// $db_pass = 'Smit!@1234';
+// $db_name = 'studio_argon';
 
 try {
     // Connect to the database directly
