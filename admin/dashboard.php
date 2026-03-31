@@ -1,18 +1,37 @@
 <?php
 $page_title = 'Dashboard';
 require_once 'includes/header.php';
+require_once '../includes/analytics_helper.php';
+
+// Fetch GA4 Stats (7 days)
+$ga_data = getGA4AnalyticsData('7daysAgo');
+$ga_total_visitors = 0;
+$ga_total_sessions = 0;
+$ga_total_unique = 0;
+$chart_labels = [];
+$chart_sessions = [];
+$chart_visitors = [];
+
+if ($ga_data && isset($ga_data['rows'])) {
+    foreach ($ga_data['rows'] as $row) {
+        $ga_total_sessions += (int)$row['metricValues'][0]['value'];
+        $ga_total_visitors += (int)$row['metricValues'][1]['value'];
+        $ga_total_unique += (int)$row['metricValues'][2]['value'];
+        
+        $date_raw = $row['dimensionValues'][0]['value'];
+        $chart_labels[] = date('D', strtotime($date_raw));
+        $chart_sessions[] = (int)$row['metricValues'][0]['value'];
+        $chart_visitors[] = (int)$row['metricValues'][1]['value'];
+    }
+}
 
 // Fetch stats
 $total_projects = $pdo->query("SELECT COUNT(*) FROM portfolio")->fetchColumn();
 $total_blog_posts = $pdo->query("SELECT COUNT(*) FROM blog_posts")->fetchColumn();
 $total_inquiries = $pdo->query("SELECT COUNT(*) FROM contact_messages")->fetchColumn();
-$total_admins = $pdo->query("SELECT COUNT(*) FROM admins")->fetchColumn();
-
-// Recent projects
+// Restore missing dashboard queries
 $recent_projects = $pdo->query("SELECT * FROM portfolio ORDER BY created_at DESC LIMIT 5")->fetchAll();
-// Recent blog posts
 $recent_blog = $pdo->query("SELECT * FROM blog_posts ORDER BY created_at DESC LIMIT 5")->fetchAll();
-
 ?>
 
 <style>
@@ -122,6 +141,137 @@ $recent_blog = $pdo->query("SELECT * FROM blog_posts ORDER BY created_at DESC LI
         }
     }
 </style>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon" style="background: #e0f2fe; color: #0ea5e9;"><i class="bi bi-people"></i></div>
+        <div class="stat-details">
+            <h3 id="stat-visitors"><?php echo number_format($ga_total_visitors); ?></h3>
+            <p>Total Visitors</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background: #f0fdf4; color: #22c55e;"><i class="bi bi-clock-history"></i></div>
+        <div class="stat-details">
+            <h3 id="stat-sessions"><?php echo number_format($ga_total_sessions); ?></h3>
+            <p>Total Sessions</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background: #faf5ff; color: #a855f7;"><i class="bi bi-person-check"></i></div>
+        <div class="stat-details">
+            <h3 id="stat-unique"><?php echo number_format($ga_total_unique); ?></h3>
+            <p>Unique Users</p>
+        </div>
+    </div>
+</div>
+
+<!-- Analytics Chart Section -->
+<div class="card" style="margin-bottom: 2.5rem; padding: 2rem;">
+    <div class="card-header" style="padding: 0; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h2 class="card-title" style="font-size: 1.2rem; margin-bottom: 0.5rem;">Website Traffic Overview</h2>
+            <p style="color: var(--text-secondary); font-size: 0.85rem;">Google Analytics Real-time data sync</p>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <select class="form-control" style="width: auto; padding: 5px 15px; font-size: 0.8rem;">
+                <option>Last 7 Days</option>
+                <option>Last 30 Days</option>
+                <option>This Month</option>
+            </select>
+        </div>
+    </div>
+    <div style="height: 350px; width: 100%; position: relative;">
+        <canvas id="trafficChart"></canvas>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('trafficChart').getContext('2d');
+        
+        // Dynamic data from Google Analytics API
+        const labels = <?php echo json_encode($chart_labels ?: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']); ?>;
+        const visitors = <?php echo json_encode($chart_visitors ?: [0,0,0,0,0,0,0]); ?>;
+        const sessions = <?php echo json_encode($chart_sessions ?: [0,0,0,0,0,0,0]); ?>;
+
+        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, 'rgba(225, 29, 72, 0.2)');
+        gradient.addColorStop(1, 'rgba(225, 29, 72, 0)');
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Sessions',
+                        data: sessions,
+                        borderColor: '#e11d48',
+                        backgroundColor: gradient,
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#e11d48',
+                        pointBorderWidth: 2
+                    },
+                    {
+                        label: 'Visitors',
+                        data: visitors,
+                        borderColor: '#334155',
+                        borderDash: [5, 5],
+                        fill: false,
+                        tension: 0.4,
+                        borderWidth: 2,
+                        pointRadius: 0
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        align: 'end',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 20,
+                            font: { size: 12, weight: '600' }
+                        }
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        backgroundColor: '#fff',
+                        titleColor: '#000',
+                        bodyColor: '#64748b',
+                        borderColor: '#e2e8f0',
+                        borderWidth: 1,
+                        padding: 12,
+                        boxPadding: 6,
+                        usePointStyle: true
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { borderDash: [5, 5], color: '#e2e8f0' },
+                        ticks: { font: { size: 11 }, padding: 10 }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { font: { size: 11 }, padding: 10 }
+                    }
+                }
+            }
+        });
+    });
+</script>
 
 <div class="stats-grid">
     <div class="stat-card">

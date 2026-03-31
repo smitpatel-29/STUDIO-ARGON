@@ -3,7 +3,7 @@
  * Database Connection for Studio Argon Dynamic Portfolio
  */
 
-// PRODUCTION DATABASE
+// // PRODUCTION DATABASE
 $db_host = 'localhost';
 $db_user = 'starlitc_argon';
 $db_pass = 'Smit!@1234';

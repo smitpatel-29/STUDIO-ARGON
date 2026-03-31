@@ -11,6 +11,9 @@ if ($_SERVER['HTTP_HOST'] == 'localhost') {
     define('BASE_URL', '/');
 }
 
+// GOOGLE ANALYTICS CONFIG
+define('GA_PROPERTY_ID', 'YOUR_PROPERTY_ID_HERE'); // Enter your GA4 Property ID (numeric only)
+
 // NAVIGATION MENU
 $nav_menu = [
     'Home' => 'index.php',
