@@ -365,12 +365,29 @@ h2 {
   animation: marquee 40s linear infinite;
 }
 .marquee-text {
-  font-size: clamp(1.2rem, 3vw, 2.5rem); font-weight: 800; 
-  color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.15);
-  text-transform: uppercase; letter-spacing: 0.15em;
+  font-size: clamp(1.2rem, 3vw, 2.5rem); 
+  font-weight: 800; 
+  color: transparent; 
+  -webkit-text-stroke: 1px rgba(255,255,255,0.15);
+  text-transform: uppercase; 
+  letter-spacing: 0.15em;
   transition: -webkit-text-stroke 0.4s, color 0.4s;
+  cursor: default;
 }
 .marquee-text:hover { -webkit-text-stroke: 1px var(--red); color: var(--red); }
+.marquee-logo {
+  height: 60px;
+  width: auto;
+  opacity: 0.3;
+  filter: grayscale(1) invert(1);
+  transition: all 0.4s ease;
+  margin: 0 40px;
+}
+.marquee-logo:hover {
+  opacity: 1;
+  filter: grayscale(0) invert(0);
+  transform: scale(1.1);
+}
 
 @keyframes marquee {
   0%   { transform: translateX(0); }

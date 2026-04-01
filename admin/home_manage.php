@@ -25,8 +25,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $message = "Stats updated.";
                 break;
             case 'add_client':
-                $stmt = $pdo->prepare("INSERT INTO home_clients (name) VALUES (?)");
-                $stmt->execute([$_POST['name']]);
+                $stmt = $pdo->prepare("INSERT INTO home_clients (name, logo_url) VALUES (?, ?)");
+                $stmt->execute([$_POST['name'], $_POST['logo_url']]);
                 $message = "Client added.";
                 break;
             case 'delete_client':
@@ -141,14 +141,21 @@ $testimonials = get_home_testimonials();
     <!-- Clients Manage -->
     <div class="card">
         <div class="card-header">
-            <h2 class="card-title">Client Logos (Names)</h2>
+            <h2 class="card-title">Partner Logos</h2>
         </div>
-        <div style="max-height: 300px; overflow-y: auto; margin-bottom: 1.5rem;">
+        <div style="max-height: 400px; overflow-y: auto; margin-bottom: 1.5rem;">
             <div class="table-responsive">
                 <table>
                     <tbody>
                         <?php foreach ($clients as $c): ?>
                         <tr>
+                            <td style="width: 60px;">
+                                <?php if ($c['logo_url']): ?>
+                                    <img src="../<?php echo $c['logo_url']; ?>" style="height: 30px; border-radius: 2px;">
+                                <?php else: ?>
+                                    <span style="font-size: 0.7rem; color: #999;">TEXT</span>
+                                <?php endif; ?>
+                            </td>
                             <td><?php echo $c['name']; ?></td>
                             <td style="text-align: right;">
                                 <form method="POST" style="display:inline;">
@@ -163,10 +170,20 @@ $testimonials = get_home_testimonials();
                 </table>
             </div>
         </div>
-        <form method="POST" style="display: flex; gap: 0.5rem;">
+        <form method="POST" style="display: flex; flex-direction: column; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 1rem;">
             <input type="hidden" name="action" value="add_client">
-            <input type="text" name="name" class="form-control" placeholder="New Client Name" required>
-            <button type="submit" class="btn btn-primary">Add</button>
+            <div class="form-group">
+                <label style="font-size: 0.8rem;">Partner Name</label>
+                <input type="text" name="name" class="form-control" placeholder="e.g. Gensler" required>
+            </div>
+            <div class="form-group">
+                <label style="font-size: 0.8rem;">Logo URL</label>
+                <div style="display: flex; gap: 0.5rem;">
+                    <input type="text" name="logo_url" id="client-logo-path" class="form-control" placeholder="Select image...">
+                    <button type="button" class="btn btn-primary" onclick="openMediaModal('client-logo-path')" style="white-space: nowrap; font-size: 0.7rem;">Select</button>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Partner</button>
         </form>
     </div>
 </div>

@@ -55,11 +55,23 @@ include 'includes/header.php';
 <div class="marquee">
   <div class="marquee-content">
     <?php foreach ($clients as $client): ?>
-    <div class="marquee-item"><span class="marquee-text"><?php echo $client['name']; ?></span></div>
+    <div class="marquee-item">
+      <?php if (!empty($client['logo_url'])): ?>
+        <img src="<?php echo $client['logo_url']; ?>" alt="<?php echo $client['name']; ?>" class="marquee-logo">
+      <?php else: ?>
+        <span class="marquee-text"><?php echo $client['name']; ?></span>
+      <?php endif; ?>
+    </div>
     <?php endforeach; ?>
     <!-- Duplicate for smooth loop -->
     <?php foreach ($clients as $client): ?>
-    <div class="marquee-item"><span class="marquee-text"><?php echo $client['name']; ?></span></div>
+    <div class="marquee-item">
+      <?php if (!empty($client['logo_url'])): ?>
+        <img src="<?php echo $client['logo_url']; ?>" alt="<?php echo $client['name']; ?>" class="marquee-logo">
+      <?php else: ?>
+        <span class="marquee-text"><?php echo $client['name']; ?></span>
+      <?php endif; ?>
+    </div>
     <?php endforeach; ?>
   </div>
 </div>
@@ -69,12 +81,12 @@ include 'includes/header.php';
   <div class="container">
     <div class="about-teaser-grid">
       <div class="about-teaser-img" data-aos="fade-right">
-        <img src="<?php echo $about_teaser['image_url']; ?>" alt="Studio Space">
+        <img src="<?php echo $about_teaser['image_url'] ?? 'assets/image/studio_space.jpg'; ?>" alt="Studio Space">
       </div>
       <div class="about-teaser-text" data-aos="fade-left">
         <span class="section-label"><?php echo $about_teaser['meta_info'] ?? 'EST. 2014'; ?></span>
-        <h2 class="section-title"><?php echo $about_teaser['heading']; ?></h2>
-        <div class="teaser-p"><?php echo nl2br($about_teaser['body_text']); ?></div>
+        <h2 class="section-title"><?php echo $about_teaser['heading'] ?? 'Innovative 3D Visuals'; ?></h2>
+        <div class="teaser-p"><?php echo nl2br($about_teaser['content'] ?? ''); ?></div>
         <div class="magnetic-wrap" style="margin-top: 1.5rem;"><a href="about.php" class="btn-primary btn-outline-red">Learn Our Story</a></div>
       </div>
     </div>
